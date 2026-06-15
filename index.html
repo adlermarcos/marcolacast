@@ -374,7 +374,7 @@ td.v-maybe-cell  { background: color-mix(in srgb, var(--maybe-bg) 50%, transpare
   <div id="app-meta" class="app-meta">Carregando…</div>
   <select id="model-select" onchange="switchModel(this.value)" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:6px 8px;border-radius:20px;cursor:pointer;flex-shrink:0;outline:none;">
     <option value="gfs">GFS 13km</option>
-    <option value="icon">ICON 13km</option>
+    <option value="icon">ICON 11km</option>
   </select>
   <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">☾ Escuro</button>
 </div>
@@ -797,7 +797,7 @@ const tideCache = {};
 let currentModel = 'gfs';
 const MODELS = {
   gfs:  { param: null,            label: 'GFS 13km',  next: 'icon' },
-  icon: { param: 'icon_seamless', label: 'ICON 13km', next: 'gfs'  },
+  icon: { param: 'icon_seamless', label: 'ICON 11km', next: 'gfs'  },
 };
 
 async function fetchSpot(spot) {
