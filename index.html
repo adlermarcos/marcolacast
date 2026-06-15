@@ -372,7 +372,10 @@ td.v-maybe-cell  { background: color-mix(in srgb, var(--maybe-bg) 50%, transpare
     <div class="app-title">Marco<span>lacast</span></div>
   </div>
   <div id="app-meta" class="app-meta">Carregando…</div>
-  <button class="theme-toggle" id="model-toggle" onclick="toggleModel()" title="Trocar modelo meteorológico">GFS 13km</button>
+  <select id="model-select" onchange="switchModel(this.value)" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:6px 8px;border-radius:20px;cursor:pointer;flex-shrink:0;outline:none;">
+    <option value="gfs">GFS</option>
+    <option value="ecmwf">ECMWF 9km</option>
+  </select>
   <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">☾ Escuro</button>
 </div>
 
@@ -859,18 +862,15 @@ async function main() {
   document.getElementById('footer').textContent = `Atualizado ${ts} · ${m.label}`;
 }
 
-async function toggleModel() {
-  const btn = document.getElementById('model-toggle');
-  currentModel = MODELS[currentModel].next;
-  const m = MODELS[currentModel];
-  btn.textContent = m.label;
-  btn.disabled = true;
-  btn.style.opacity = '0.5';
-  // clear cache so detail view also refreshes
+async function switchModel(val) {
+  currentModel = val;
+  const sel = document.getElementById('model-select');
+  sel.disabled = true;
+  sel.style.opacity = '0.5';
   Object.keys(dataCache).forEach(k => delete dataCache[k]);
   await main();
-  btn.disabled = false;
-  btn.style.opacity = '';
+  sel.disabled = false;
+  sel.style.opacity = '';
 }
 
 function toggleTheme() {
