@@ -815,10 +815,6 @@ async function fetchSpot(spot) {
   const r = await fetch(`https://api.open-meteo.com/v1/forecast?${p}`);
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   const wind = (await r.json()).hourly;
-  // ECMWF não fornece rajadas instantâneas — usa vento médio como proxy
-  if (currentModel === 'ecmwf' && wind.windgusts_10m?.every(v => v == null)) {
-    wind.windgusts_10m = wind.windspeed_10m;
-  }
 
   // Marine data (waves + tide) — separate endpoint
   const pm = new URLSearchParams({
@@ -874,7 +870,7 @@ async function switchModel(val) {
   sel.style.opacity = '0.5';
   Object.keys(dataCache).forEach(k => delete dataCache[k]);
   // Always return to main view during reload so user sees progress
-  const wasOnDetail = document.getElementById('view-detail').style.display !== 'none';
+  const wasOnDetail = document.getElementById('view-detail').style.display === 'block';
   showMain();
   await main();
   sel.disabled = false;
