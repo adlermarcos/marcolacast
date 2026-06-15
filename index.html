@@ -372,6 +372,7 @@ td.v-maybe-cell  { background: color-mix(in srgb, var(--maybe-bg) 50%, transpare
     <div class="app-title">Marco<span>lacast</span></div>
   </div>
   <div id="app-meta" class="app-meta">Carregando…</div>
+  <button class="theme-toggle" id="model-toggle" onclick="toggleModel()" title="Trocar modelo meteorológico">GFS 13km</button>
   <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">☾ Escuro</button>
 </div>
 
@@ -790,6 +791,11 @@ function showMain() {
 
 // ── FETCH & INIT ─────────────────────────────────────────────
 const tideCache = {};
+let currentModel = 'gfs';
+const MODELS = {
+  gfs:   { param: 'gfs013',     label: 'GFS 13km',   next: 'ecmwf' },
+  ecmwf: { param: 'ecmwf_ifs',  label: 'ECMWF 9km',  next: 'gfs'   },
+};
 
 async function fetchSpot(spot) {
   const p = new URLSearchParams({
@@ -798,6 +804,7 @@ async function fetchSpot(spot) {
       'windspeed_10m','windgusts_10m','winddirection_10m',
       'temperature_2m','cloudcover','precipitation',
     ].join(','),
+    models: MODELS[currentModel].param,
     wind_speed_unit: 'kn',
     timezone: 'America/Sao_Paulo',
     forecast_days: 10,
@@ -847,8 +854,23 @@ async function main() {
 
   const now = new Date();
   const ts  = now.toLocaleString('pt-BR', {dateStyle:'short', timeStyle:'short'});
-  document.getElementById('app-meta').innerHTML = `GFS 13 km · Open-Meteo · 10 m<br>${ts}`;
-  document.getElementById('footer').textContent = `Atualizado ${ts}`;
+  const m   = MODELS[currentModel];
+  document.getElementById('app-meta').innerHTML = `${m.label} · Open-Meteo · 10 m<br>${ts}`;
+  document.getElementById('footer').textContent = `Atualizado ${ts} · ${m.label}`;
+}
+
+async function toggleModel() {
+  const btn = document.getElementById('model-toggle');
+  currentModel = MODELS[currentModel].next;
+  const m = MODELS[currentModel];
+  btn.textContent = m.label;
+  btn.disabled = true;
+  btn.style.opacity = '0.5';
+  // clear cache so detail view also refreshes
+  Object.keys(dataCache).forEach(k => delete dataCache[k]);
+  await main();
+  btn.disabled = false;
+  btn.style.opacity = '';
 }
 
 function toggleTheme() {
