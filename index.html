@@ -45,12 +45,12 @@
   --text:          #dde3f0;
   --muted:         #6a7590;
   --faint:         #404a60;
-  --go:            #4de8a0;
-  --go-bg:         #0d2e20;
-  --go-border:     #1a5c3a;
-  --strong:        #7af0b8;
-  --strong-bg:     #0a3d22;
-  --strong-border: #2a7a50;
+  --go:            #2ddc88;
+  --go-bg:         #1a4d30;
+  --go-border:     #2a8050;
+  --strong:        #50f0a0;
+  --strong-bg:     #1a5535;
+  --strong-border: #38a060;
   --maybe:         #f0c060;
   --maybe-bg:      #2a1e00;
   --maybe-border:  #5a4000;
@@ -74,21 +74,25 @@ body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Sans', 
 .app-bar {
   position: sticky; top: 0; z-index: 100;
   background: var(--surface);
-  border-bottom: 1px solid var(--border2);
-  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 8px rgba(0,0,0,0.08);
+  padding: 12px 16px;
   display: flex; justify-content: space-between; align-items: center; gap: 8px;
 }
-.app-title { font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; letter-spacing: -0.02em; color: var(--text); }
+[data-theme="dark"] .app-bar { box-shadow: 0 1px 12px rgba(0,0,0,0.4); }
+.app-title { font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 600; letter-spacing: -0.03em; color: var(--text); }
 .app-title span { color: var(--accent); }
 .app-meta  { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--faint); text-align: right; line-height: 1.4; flex: 1; }
 .theme-toggle {
   background: var(--surface2); border: 1px solid var(--border2); color: var(--muted);
-  font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 5px 10px;
-  border-radius: 6px; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 6px 11px;
+  border-radius: 20px; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  transition: background .15s, color .15s;
 }
+.theme-toggle:active { opacity: .7; }
 .back-btn {
   background: none; border: none; color: var(--accent);
-  font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600;
   cursor: pointer; padding: 2px 4px; flex-shrink: 0; display: none;
 }
 
@@ -105,10 +109,11 @@ body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Sans', 
 .leg-swatch { width: 16px; height: 7px; border-radius: 2px; border: 1px solid; flex-shrink: 0; }
 
 /* ── SPOT CARD ── */
-.spot { background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
-.spot-head { padding: 8px 12px; background: var(--surface2); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-.spot-name { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 12px; color: var(--text); }
-.spot-sub  { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--faint); margin-top: 1px; }
+.spot { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+[data-theme="dark"] .spot { box-shadow: 0 2px 12px rgba(0,0,0,0.35); }
+.spot-head { padding: 10px 14px 9px; background: var(--surface2); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.spot-name { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 13px; color: var(--text); letter-spacing: -0.01em; }
+.spot-sub  { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--faint); margin-top: 2px; }
 
 /* ── MAIN TABLE ── */
 table { width: 100%; border-collapse: collapse; }
@@ -260,7 +265,7 @@ td.v-maybe-cell  { background: color-mix(in srgb, var(--maybe-bg) 50%, transpare
 
 /* off-peak hours: faded */
 .wg-table tr.hour-row th.dim-col  { background: var(--surface2); color: var(--faint); font-weight: 400; }
-.wg-table td.dim-col  { opacity: 0.45; font-weight: 400; }
+.wg-table td.dim-col  { opacity: 0.62; font-weight: 400; }
 
 /* weekend hour headers — orange background */
 .wg-table tr.hour-row th.wk-day.peak-col { background: #f0d8a8; color: #6a3000; font-weight: 700; }
@@ -328,7 +333,7 @@ td.v-maybe-cell  { background: color-mix(in srgb, var(--maybe-bg) 50%, transpare
 .tp-cell { background:#fff0d8; color:#6a3000; }
 
 /* ── DIR arrow ── */
-.dir-cell { font-size: 13px; color: var(--text); background: transparent !important; outline: none !important; }
+.dir-cell { font-size: 14px; line-height: 1; width: 14px; text-align: center; color: var(--text); background: transparent !important; outline: none !important; font-family: 'IBM Plex Mono', monospace; }
 
 /* loading */
 .loading-cell { padding: 1rem; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--faint); }
@@ -369,13 +374,14 @@ td.v-maybe-cell  { background: color-mix(in srgb, var(--maybe-bg) 50%, transpare
 <div id="view-main">
   <div class="page">
     <div class="legend">
-      <span class="leg"><span class="leg-swatch" style="background:var(--strong-bg);border-color:var(--strong-border)"></span>≥14kt e rajada ≥18kt — Ótimo!</span>
+      <span class="leg"><span class="leg-swatch" style="background:var(--strong-bg);border-color:var(--strong-border)"></span>≥14kt + rajada ≥18kt — Ótimo!</span>
       <span class="leg"><span class="leg-swatch" style="background:var(--go-bg);border-color:var(--go-border)"></span>Rajada ≥14kt — Vai!</span>
       <span class="leg"><span class="leg-swatch" style="background:var(--maybe-bg);border-color:var(--maybe-border)"></span>10–13kt — Talvez</span>
       <span class="leg"><span class="leg-swatch" style="background:var(--bad-bg);border-color:var(--bad-border)"></span>Fraco</span>
       <span class="leg" style="color:#b06820;font-weight:700;gap:2px">
-        <span style="display:inline-block;width:3px;height:12px;background:var(--wk-bar);border-radius:1px;margin-right:3px"></span>Sáb Dom
+        <span style="display:inline-block;width:3px;height:12px;background:var(--wk-bar);border-radius:1px;margin-right:3px"></span>Sáb · Dom
       </span>
+      <span class="leg" style="color:var(--faint)">3 janelas: 7–11h · 11–14h · 14–17h</span>
     </div>
     <div id="spots-container"></div>
     <div class="note">
@@ -399,9 +405,6 @@ td.v-maybe-cell  { background: color-mix(in srgb, var(--maybe-bg) 50%, transpare
         <tbody id="wg-body"></tbody>
       </table>
     </div>
-    <div class="note" style="margin-top:10px;margin-bottom:0">
-      Colunas <span style="display:inline-block;width:8px;height:8px;background:color-mix(in srgb,var(--accent) 15%,#fff);border:1px solid var(--accent);border-radius:1px;vertical-align:middle"></span> = janelas de vela (08–11h e 13–16h) · Separadores de dia: cinza = semana, <span style="color:#b06820;font-weight:700">âmbar</span> = fim de semana.
-    </div>
   </div>
 </div>
 
@@ -414,9 +417,10 @@ const SPOTS = [
   { name: 'Enseada de Palmas',  sub: 'Angra dos Reis',                       lat: -23.118167, lon: -44.092328 },
 ];
 
-const MORNING_HOURS   = [7,8,9,10,11];
-const AFTERNOON_HOURS = [12,13,14,15,16,17];
-const SAIL_HOURS      = new Set([...MORNING_HOURS, ...AFTERNOON_HOURS]); // 7–17h
+const MORNING_HOURS   = [7,8,9,10];
+const LUNCH_HOURS     = [11,12,13];
+const AFTERNOON_HOURS = [14,15,16];
+const SAIL_HOURS      = new Set([...MORNING_HOURS, ...LUNCH_HOURS, ...AFTERNOON_HOURS]); // 7–17h
 const DAYS_PT   = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const MONTHS_PT = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 
@@ -494,6 +498,7 @@ function renderSpot(spotIdx, h) {
     const dow      = DAYS_PT[dayIdx];
     const ddate    = `${dt.getDate()} ${MONTHS_PT[dt.getMonth()]}`;
     const morn     = windowStats(h,dateStr,MORNING_HOURS);
+    const lunch    = windowStats(h,dateStr,LUNCH_HOURS);
     const aftn     = windowStats(h,dateStr,AFTERNOON_HOURS);
     const trCls    = [isWk?'weekend':'',isSat?'weekend-sat':'',isSun?'weekend-sun':''].filter(Boolean).join(' ');
     const dowCls   = isWk?' dow-weekend':'';
@@ -504,6 +509,7 @@ function renderSpot(spotIdx, h) {
         <span class="ddate${ddateCls}">${ddate}</span>
       </td>
       ${buildCell(morn)}
+      ${buildCell(lunch)}
       ${buildCell(aftn)}
     </tr>`;
   });
@@ -518,8 +524,9 @@ function renderSpot(spotIdx, h) {
     <table>
       <thead><tr>
         <th>Data</th>
-        <th class="window-header">Manhã 08–11h<span class="window-label">vento · ↑ rajada · dir</span></th>
-        <th class="window-header">Tarde 13–16h<span class="window-label">vento · ↑ rajada · dir</span></th>
+        <th class="window-header">Manhã 7–11h<span class="window-label">vento · ↑ rajada · dir</span></th>
+        <th class="window-header">Almoço 11–14h<span class="window-label">vento · ↑ rajada · dir</span></th>
+        <th class="window-header">Tarde 14–17h<span class="window-label">vento · ↑ rajada · dir</span></th>
       </tr></thead>
       <tbody>${rows}</tbody>
     </table>
