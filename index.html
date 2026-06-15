@@ -801,10 +801,13 @@ const MODELS = {
 };
 
 async function fetchSpot(spot) {
+  const isEcmwf = currentModel === 'ecmwf';
   const p = new URLSearchParams({
     latitude: spot.lat, longitude: spot.lon,
     hourly: [
-      'windspeed_10m','windgusts_10m','winddirection_10m',
+      'windspeed_10m',
+      isEcmwf ? 'wind_gusts_10m' : 'windgusts_10m',
+      'winddirection_10m',
       'temperature_2m','cloudcover','precipitation',
     ].join(','),
     wind_speed_unit: 'kn',
@@ -815,6 +818,7 @@ async function fetchSpot(spot) {
   const r = await fetch(`https://api.open-meteo.com/v1/forecast?${p}`);
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   const wind = (await r.json()).hourly;
+  if (isEcmwf) wind.windgusts_10m = wind.wind_gusts_10m;
 
   // Marine data (waves + tide) — separate endpoint
   const pm = new URLSearchParams({
