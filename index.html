@@ -793,8 +793,8 @@ function showMain() {
 const tideCache = {};
 let currentModel = 'gfs';
 const MODELS = {
-  gfs:   { param: 'gfs013',     label: 'GFS 13km',   next: 'ecmwf' },
-  ecmwf: { param: 'ecmwf_ifs',  label: 'ECMWF 9km',  next: 'gfs'   },
+  gfs:   { param: 'gfs_seamless', label: 'GFS 25km',  next: 'ecmwf' },
+  ecmwf: { param: 'ifs_hres',     label: 'ECMWF 9km', next: 'gfs'   },
 };
 
 async function fetchSpot(spot) {
