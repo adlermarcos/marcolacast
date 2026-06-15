@@ -204,17 +204,22 @@ td.v-maybe-cell  { background: color-mix(in srgb, var(--maybe-bg) 50%, transpare
 /* sticky row-label column */
 .wg-table td.row-label {
   text-align: left;
-  font-size: 9px;
+  font-size: 8px;
   color: var(--muted);
   background: var(--surface2);
   border-right: 2px solid var(--border2);
   font-weight: 500;
   white-space: nowrap;
-  min-width: 120px;
-  max-width: 120px;
+  min-width: 72px;
+  max-width: 72px;
+  width: 72px;
+  padding: 6px 4px 6px 6px;
   position: sticky;
   left: 0;
   z-index: 2;
+}
+@media (min-width: 600px) {
+  .wg-table td.row-label { font-size: 9px; min-width: 110px; max-width: 110px; width: 110px; padding: 6px 5px; }
 }
 /* sticky header row — 3 lines: dow / date / hour */
 .wg-table tr.hour-row th {
@@ -233,7 +238,7 @@ td.v-maybe-cell  { background: color-mix(in srgb, var(--maybe-bg) 50%, transpare
   border-right: 2px solid var(--border2);
   text-align: left;
   font-size: 9px;
-  min-width: 120px;
+  min-width: 72px;
   vertical-align: middle;
 }
 /* day separator */
@@ -374,9 +379,9 @@ td.v-maybe-cell  { background: color-mix(in srgb, var(--maybe-bg) 50%, transpare
 <div id="view-main">
   <div class="page">
     <div class="legend">
-      <span class="leg"><span class="leg-swatch" style="background:var(--strong-bg);border-color:var(--strong-border)"></span>≥14kt + rajada ≥18kt — Ótimo!</span>
-      <span class="leg"><span class="leg-swatch" style="background:var(--go-bg);border-color:var(--go-border)"></span>Rajada ≥14kt — Vai!</span>
-      <span class="leg"><span class="leg-swatch" style="background:var(--maybe-bg);border-color:var(--maybe-border)"></span>10–13kt — Talvez</span>
+      <span class="leg"><span class="leg-swatch" style="background:var(--strong-bg);border-color:var(--strong-border)"></span>≥12kt + rajada ≥18kt — Ótimo!</span>
+      <span class="leg"><span class="leg-swatch" style="background:var(--go-bg);border-color:var(--go-border)"></span>Rajada ≥15kt — Vai!</span>
+      <span class="leg"><span class="leg-swatch" style="background:var(--maybe-bg);border-color:var(--maybe-border)"></span>Rajada 12–14kt — Talvez</span>
       <span class="leg"><span class="leg-swatch" style="background:var(--bad-bg);border-color:var(--bad-border)"></span>Fraco</span>
       <span class="leg" style="color:#b06820;font-weight:700;gap:2px">
         <span style="display:inline-block;width:3px;height:12px;background:var(--wk-bar);border-radius:1px;margin-right:3px"></span>Sáb · Dom
@@ -412,7 +417,7 @@ td.v-maybe-cell  { background: color-mix(in srgb, var(--maybe-bg) 50%, transpare
 const SPOTS = [
   { name: 'Baía de Guanabara',  sub: 'Praia do Flamengo · Rio de Janeiro',  lat: -22.930387, lon: -43.158968 },
   { name: 'Barra da Tijuca',    sub: 'Praia da Barra · Rio de Janeiro',      lat: -23.012,    lon: -43.390    },
-  { name: 'Armação de Búzios',  sub: 'Praia de Manguinhos · Búzios Vela Clube', lat: -22.757949, lon: -41.921844 },
+  { name: 'Armação dos Búzios', sub: 'Praia de Manguinhos · Búzios Vela Clube', lat: -22.757949, lon: -41.921844 },
   { name: 'Ilha da Jipoia',     sub: 'Baía de Angra dos Reis · face externa', lat: -23.0833,   lon: -44.3167   },
   { name: 'Enseada de Palmas',  sub: 'Angra dos Reis',                       lat: -23.118167, lon: -44.092328 },
 ];
@@ -454,16 +459,16 @@ function windowStats(h, dateStr, hours) {
 
 function verdict(speed,gust) {
   if(gust==null)              return {cls:'v-bad',   label:'—'};
-  if(speed>=14&&gust>=18)     return {cls:'v-strong',label:'ÓTIMO!'};
-  if(gust>=14)                return {cls:'v-go',    label:'VAI!'};
-  if(gust>=10)                return {cls:'v-maybe', label:'TALVEZ'};
+  if(speed>=12&&gust>=18)     return {cls:'v-strong',label:'ÓTIMO!'};
+  if(gust>=15)                return {cls:'v-go',    label:'VAI!'};
+  if(gust>=12)                return {cls:'v-maybe', label:'TALVEZ'};
   return                             {cls:'v-bad',   label:'FRACO'};
 }
 function cellCls(speed,gust) {
   if(gust==null)          return '';
-  if(speed>=14&&gust>=18) return 'v-strong-cell';
-  if(gust>=14)            return 'v-go-cell';
-  if(gust>=10)            return 'v-maybe-cell';
+  if(speed>=12&&gust>=18) return 'v-strong-cell';
+  if(gust>=15)            return 'v-go-cell';
+  if(gust>=12)            return 'v-maybe-cell';
   return '';
 }
 function buildCell(stats) {
@@ -859,6 +864,13 @@ function toggleTheme() {
 }
 
 main();
+
+// Horizontal scroll with mouse wheel on detail table (no Shift needed)
+document.getElementById('wg-scroll').addEventListener('wheel', function(e) {
+  if (e.deltaY === 0) return;
+  e.preventDefault();
+  this.scrollLeft += e.deltaY;
+}, { passive: false });
 </script>
 </body>
 </html>
