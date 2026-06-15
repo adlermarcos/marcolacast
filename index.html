@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Marcolacast">
+<title>Marcolacast</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:            #f5f4f0;
+  --surface:       #ffffff;
+  --surface2:      #eeecea;
+  --border:        #d8d5cf;
+  --border2:       #c8c4bc;
+  --text:          #1a1814;
+  --muted:         #7a756c;
+  --faint:         #a8a39a;
+  --go:            #0a6640;
+  --go-bg:         #d4f0e2;
+  --go-border:     #6fcca0;
+  --strong:        #143d25;
+  --strong-bg:     #8ed8ac;
+  --strong-border: #4db87e;
+  --maybe:         #7a4a00;
+  --maybe-bg:      #fde9c0;
+  --maybe-border:  #f0b840;
+  --bad:           #555050;
+  --bad-bg:        #ebebeb;
+  --bad-border:    #c8c4bc;
+  --accent:        #1a4e8a;
+  --hover-bg:      #f0ede8;
+  --wk-bar:        #1a4e8a;
+  --wk-sep:        #b0adb8;
+}
+[data-theme="dark"] {
+  --bg:            #111318;
+  --surface:       #181c24;
+  --surface2:      #1e2330;
+  --border:        #252c3a;
+  --border2:       #2e3748;
+  --text:          #dde3f0;
+  --muted:         #6a7590;
+  --faint:         #404a60;
+  --go:            #4de8a0;
+  --go-bg:         #0d2e20;
+  --go-border:     #1a5c3a;
+  --strong:        #7af0b8;
+  --strong-bg:     #0a3d22;
+  --strong-border: #2a7a50;
+  --maybe:         #f0c060;
+  --maybe-bg:      #2a1e00;
+  --maybe-border:  #5a4000;
+  --bad:           #3a4255;
+  --bad-bg:        #161a24;
+  --bad-border:    #252c3a;
+  --accent:        #5a8ee0;
+  --hover-bg:      #1e2330;
+  --wk-bar:        #5a8ee0;
+  --wk-sep:        #3a4060;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; line-height: 1.5; -webkit-text-size-adjust: 100%; }
+
+/* ── VIEWS ── */
+#view-main   { display: block; }
+#view-detail { display: none;  }
+
+/* ── APP BAR ── */
+.app-bar {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border2);
+  padding: 10px 14px;
+  display: flex; justify-content: space-between; align-items: center; gap: 8px;
+}
+.app-title { font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; letter-spacing: -0.02em; color: var(--text); }
+.app-title span { color: var(--accent); }
+.app-meta  { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--faint); text-align: right; line-height: 1.4; flex: 1; }
+.theme-toggle {
+  background: var(--surface2); border: 1px solid var(--border2); color: var(--muted);
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 5px 10px;
+  border-radius: 6px; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+}
+.back-btn {
+  background: none; border: none; color: var(--accent);
+  font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+  cursor: pointer; padding: 2px 4px; flex-shrink: 0; display: none;
+}
+
+/* ── PAGE ── */
+.page { padding: 10px 10px 40px; max-width: 700px; margin: 0 auto; }
+#view-detail .page { max-width: none; padding: 10px 0 40px; }
+
+/* ── LEGEND ── */
+.legend {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;
+  padding: 8px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+}
+.leg { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
+.leg-swatch { width: 16px; height: 7px; border-radius: 2px; border: 1px solid; flex-shrink: 0; }
+
+/* ── SPOT CARD ── */
+.spot { background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
+.spot-head { padding: 8px 12px; background: var(--surface2); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.spot-name { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 12px; color: var(--text); }
+.spot-sub  { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--faint); margin-top: 1px; }
+
+/* ── MAIN TABLE ── */
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 500; color: var(--muted);
+  padding: 5px 6px; text-align: center; border-bottom: 1px solid var(--border);
+  background: var(--surface); white-space: nowrap;
+}
+thead th:first-child { text-align: left; width: 52px; }
+thead th.window-header { background: var(--surface2); border-left: 1px solid var(--border2); }
+.window-label { font-size: 8px; color: var(--faint); display: block; font-weight: 400; margin-top: 1px; }
+
+tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--hover-bg) !important; cursor: pointer; }
+
+/* ── WEEKEND STYLING ── */
+/* thin gray separator above Sat, below Sun */
+tbody tr.weekend-sat td { border-top: 1px solid var(--wk-sep); }
+tbody tr.weekend-sun td { border-bottom: 1px solid var(--wk-sep); }
+/* blue accent bar on first cell of weekend rows */
+tbody tr.weekend td.date-cell { border-left: 3px solid var(--wk-bar); padding-left: 4px; }
+/* amber text for whole weekend row */
+.dow-weekend   { color: #b06820 !important; font-weight: 700 !important; }
+.ddate-weekend { color: #b06820 !important; }
+tr.weekend .wind-val { color: #c07830 !important; }
+tr.weekend .gust-val { color: #b06820 !important; }
+tr.weekend .dir-val  { color: #c8904a !important; }
+tr.weekend .sep      { color: #d4a870 !important; }
+[data-theme="dark"] .dow-weekend   { color: #e8a050 !important; }
+[data-theme="dark"] .ddate-weekend { color: #e8a050 !important; }
+[data-theme="dark"] tr.weekend .wind-val { color: #d09040 !important; }
+[data-theme="dark"] tr.weekend .gust-val { color: #e8a050 !important; }
+[data-theme="dark"] tr.weekend .dir-val  { color: #c08030 !important; }
+[data-theme="dark"] tr.weekend .sep      { color: #906030 !important; }
+
+td { padding: 5px 6px; text-align: center; vertical-align: middle; }
+td.date-cell { text-align: left; width: 52px; }
+.dow   { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: var(--text); display: block; }
+.ddate { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--muted); display: block; }
+td.window-cell { border-left: 1px solid var(--border2); }
+
+/* ── CELL CONTENT ── */
+.cell-inner { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.cell-top   { display: flex; align-items: center; gap: 4px; justify-content: center; }
+.cell-bot   { display: flex; align-items: center; gap: 4px; justify-content: center; }
+.wind-val { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 400; color: var(--muted); white-space: nowrap; }
+.gust-val { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; }
+.sep      { color: var(--faint); font-size: 9px; }
+.dir-val  { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--faint); }
+.verdict  { font-family: 'IBM Plex Mono', monospace; font-size: 8px; font-weight: 600; padding: 1px 4px; border-radius: 2px; border: 1px solid; white-space: nowrap; letter-spacing: .04em; }
+.v-strong { background: var(--strong-bg); color: var(--strong); border-color: var(--strong-border); }
+.v-go     { background: var(--go-bg);     color: var(--go);     border-color: var(--go-border); }
+.v-maybe  { background: var(--maybe-bg);  color: var(--maybe);  border-color: var(--maybe-border); }
+.v-bad    { background: var(--bad-bg);    color: var(--bad);    border-color: var(--bad-border); }
+td.v-strong-cell { background: color-mix(in srgb, var(--strong-bg) 65%, transparent); }
+td.v-go-cell     { background: color-mix(in srgb, var(--go-bg) 50%, transparent); }
+td.v-maybe-cell  { background: color-mix(in srgb, var(--maybe-bg) 50%, transparent); }
+
+/* ── DETAIL VIEW ── */
+.detail-header { padding: 8px 0 5px; margin-bottom: 6px; border-bottom: 1px solid var(--border2); }
+.detail-title  { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: var(--text); }
+.detail-sub    { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--muted); margin-top: 1px; }
+
+/* Windguru-style transposed table */
+.wg-scroll {
+  overflow-x: auto;
+  border-radius: 0;
+  border-top: 1px solid var(--border2);
+  border-bottom: 1px solid var(--border2);
+  width: 100%;
+}
+.wg-table {
+  border-collapse: collapse;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  white-space: nowrap;
+  width: 100%;
+}
+.wg-table th, .wg-table td {
+  padding: 6px 5px;
+  text-align: center;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border);
+  min-width: 34px;
+  height: 28px;
+}
+/* sticky row-label column */
+.wg-table td.row-label {
+  text-align: left;
+  font-size: 9px;
+  color: var(--muted);
+  background: var(--surface2);
+  border-right: 2px solid var(--border2);
+  font-weight: 500;
+  white-space: nowrap;
+  min-width: 120px;
+  max-width: 120px;
+  position: sticky;
+  left: 0;
+  z-index: 2;
+}
+/* sticky header row — 3 lines: dow / date / hour */
+.wg-table tr.hour-row th {
+  background: var(--surface2);
+  font-size: 10px; font-weight: 600; color: var(--text);
+  border-bottom: 2px solid var(--border2);
+  position: sticky; top: 0; z-index: 3;
+  padding: 4px 5px;
+  height: 50px;
+  line-height: 1.4;
+  vertical-align: middle;
+}
+.wg-table tr.hour-row th.label-th {
+  position: sticky; left: 0; z-index: 4;
+  background: var(--surface2);
+  border-right: 2px solid var(--border2);
+  text-align: left;
+  font-size: 9px;
+  min-width: 120px;
+  vertical-align: middle;
+}
+/* day separator */
+.wg-table th.day-start,
+.wg-table td.day-start { border-left: 2px solid var(--border2); }
+/* weekend day start — amber border */
+.wg-table th.wk-start,
+.wg-table td.wk-start  { border-left: 2px solid #c07820; }
+[data-theme="dark"] .wg-table th.wk-start,
+[data-theme="dark"] .wg-table td.wk-start { border-left: 2px solid #e8a050; }
+
+/* day header row (spanning) */
+.wg-table tr.day-header-row th {
+  background: var(--surface);
+  font-size: 9px; font-weight: 700; color: var(--text);
+  border-bottom: 1px solid var(--border);
+  padding: 3px 5px;
+}
+.wg-table tr.day-header-row th.wk-day { color: #b06820; }
+[data-theme="dark"] .wg-table tr.day-header-row th.wk-day { color: #e8a050; }
+
+/* sail window: ONLY header gets blue tint */
+.wg-table th.sail-col { background: color-mix(in srgb, var(--accent) 16%, var(--surface2)) !important; color: var(--accent); }
+.wg-table td.sail-col { background: transparent !important; outline: none !important; }
+
+/* peak hours 08–17: bold + darker header */
+.wg-table tr.hour-row th.peak-col { background: color-mix(in srgb, var(--border2) 55%, var(--surface2)); color: var(--text); font-weight: 700; }
+.wg-table td.peak-col { font-weight: 700; }
+
+/* off-peak hours: faded */
+.wg-table tr.hour-row th.dim-col  { background: var(--surface2); color: var(--faint); font-weight: 400; }
+.wg-table td.dim-col  { opacity: 0.45; font-weight: 400; }
+
+/* weekend hour headers — orange background */
+.wg-table tr.hour-row th.wk-day.peak-col { background: #f0d8a8; color: #6a3000; font-weight: 700; }
+.wg-table tr.hour-row th.wk-day.dim-col  { background: #f5e8cc; color: #b07830; font-weight: 400; }
+.wg-table tr.hour-row th.wk-day.sail-col { background: color-mix(in srgb, #b06820 20%, #f0d8a8) !important; color: #6a3000; }
+[data-theme="dark"] .wg-table tr.hour-row th.wk-day.peak-col { background: #2e1e04; color: #f0b050; font-weight: 700; }
+[data-theme="dark"] .wg-table tr.hour-row th.wk-day.dim-col  { background: #1e1604; color: #907030; font-weight: 400; }
+
+/* row separators */
+.wg-table tr.row-sep td { border-top: 2px solid var(--border2); }
+
+/* ── TIDE color scale — dark blue = high, very light = low ── */
+.tide-hi  { background:#0a4e90; color:#ffffff; font-weight:700; }
+.tide-mhi { background:#3a80c8; color:#ffffff; }
+.tide-mid { background:#88b8e0; color:#0a2848; }
+.tide-mlo { background:#cce4f5; color:#1a3a5c; }
+.tide-lo  { background:#eef7fd; color:#5a80a0; }
+[data-theme="dark"] .tide-hi  { background:#1060b8; color:#ffffff; font-weight:700; }
+[data-theme="dark"] .tide-mhi { background:#1a4070; color:#c0d8f0; }
+[data-theme="dark"] .tide-mid { background:#162438; color:#6090b8; }
+[data-theme="dark"] .tide-mlo { background:#0e1620; color:#3a5068; }
+[data-theme="dark"] .tide-lo  { background:#080e14; color:#2a3848; }
+.ws-0  { background:#f0f4f8; color:#6a8090; }   /* <4 kt  */
+.ws-1  { background:#cce4f5; color:#1a3a5c; }   /* 4–6   */
+.ws-2  { background:#96c8ea; color:#1a3a5c; }   /* 7–9   */
+.ws-3  { background:#58a8dc; color:#0a2040; }   /* 10–13 */
+.ws-4  { background:#2080c8; color:#ffffff; }   /* 14–17 */
+.ws-5  { background:#0d5ca0; color:#ffffff; }   /* 18–21 */
+.ws-6  { background:#08408a; color:#ffffff; }   /* 22–27 */
+.ws-7  { background:#4a1080; color:#ffffff; }   /* ≥28   */
+
+/* ── WIND GUST color scale — match Windguru ── */
+.wg-0  { background:#f0f4f8; color:#6a8090; }   /* <5 kt  */
+.wg-1  { background:#cce8d8; color:#143d25; }   /* 5–8   */
+.wg-2  { background:#80cc98; color:#0a2810; }   /* 9–11  */
+.wg-3  { background:#38b060; color:#002010; }   /* 12–15 */
+.wg-4  { background:#108840; color:#ffffff; }   /* 16–19 */
+.wg-5  { background:#086030; color:#ffffff; }   /* 20–23 */
+.wg-6  { background:#e8c040; color:#3a2800; }   /* 24–27 — yellow readable */
+.wg-7  { background:#d06010; color:#ffffff; }   /* 28–33 */
+.wg-8  { background:#b02808; color:#ffffff; }   /* ≥34   */
+
+/* ── WAVE height ── */
+.wv-0  { background:#f0f6fb; color:#5a7090; }
+.wv-1  { background:#bcd8f0; color:#1a3a5c; }
+.wv-2  { background:#70aede; color:#0a2040; }
+.wv-3  { background:#2878c0; color:#ffffff; }
+.wv-4  { background:#0550a0; color:#ffffff; }
+.wv-5  { background:#4a1888; color:#ffffff; }
+
+/* ── CLOUD cover ── */
+.cc-0 { background:#fafaf5; color:#8a8880; }
+.cc-1 { background:#dcdad0; color:#3a3830; }
+.cc-2 { background:#aeaaa0; color:#1a1810; }
+.cc-3 { background:#808078; color:#ffffff; }
+.cc-4 { background:#585850; color:#ffffff; }
+
+/* ── PRECIP ── */
+.pp-0 { color: var(--faint); background: transparent; }
+.pp-1 { background:#bce4f8; color:#0a3060; }
+.pp-2 { background:#50a8d8; color:#ffffff; }
+.pp-3 { background:#0868b0; color:#ffffff; }
+
+/* ── TEMP ── */
+.tp-cell { background:#fff0d8; color:#6a3000; }
+
+/* ── DIR arrow ── */
+.dir-cell { font-size: 13px; color: var(--text); background: transparent !important; outline: none !important; }
+
+/* loading */
+.loading-cell { padding: 1rem; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--faint); }
+
+/* NOTE */
+.note { font-size: 11px; color: var(--muted); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 10px 12px; border-radius: 8px; line-height: 1.7; margin-top: 10px; }
+.note b { color: var(--text); }
+.footer { margin-top: 16px; font-size: 10px; color: var(--faint); font-family: 'IBM Plex Mono', monospace; text-align: center; }
+
+/* ── DESKTOP ── */
+@media (min-width: 600px) {
+  .cell-inner { flex-direction: row; gap: 5px; }
+  .cell-bot, .cell-top { display: contents; }
+  .wind-val, .gust-val, .dir-val, .verdict, .sep { display: inline; }
+  td { padding: 4px 8px; }
+  thead th { font-size: 10px; padding: 5px 8px; }
+  thead th:first-child { width: auto; min-width: 80px; }
+  .dow   { display: inline; font-size: 11px; }
+  .ddate { display: inline; font-size: 10px; margin-left: 4px; }
+  .verdict { font-size: 9px; padding: 1px 5px; }
+  .gust-val { font-size: 13px; }
+  .wind-val { font-size: 13px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app-bar">
+  <button class="back-btn" id="back-btn" onclick="showMain()">← Voltar</button>
+  <div id="app-title-wrap">
+    <div class="app-title">Marco<span>lacast</span></div>
+  </div>
+  <div id="app-meta" class="app-meta">Carregando…</div>
+  <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">☾ Escuro</button>
+</div>
+
+<!-- MAIN VIEW -->
+<div id="view-main">
+  <div class="page">
+    <div class="legend">
+      <span class="leg"><span class="leg-swatch" style="background:var(--strong-bg);border-color:var(--strong-border)"></span>≥14kt e rajada ≥18kt — Ótimo!</span>
+      <span class="leg"><span class="leg-swatch" style="background:var(--go-bg);border-color:var(--go-border)"></span>Rajada ≥14kt — Vai!</span>
+      <span class="leg"><span class="leg-swatch" style="background:var(--maybe-bg);border-color:var(--maybe-border)"></span>10–13kt — Talvez</span>
+      <span class="leg"><span class="leg-swatch" style="background:var(--bad-bg);border-color:var(--bad-border)"></span>Fraco</span>
+      <span class="leg" style="color:#b06820;font-weight:700;gap:2px">
+        <span style="display:inline-block;width:3px;height:12px;background:var(--wk-bar);border-radius:1px;margin-right:3px"></span>Sáb Dom
+      </span>
+    </div>
+    <div id="spots-container"></div>
+    <div class="note">
+      <b>Modelo:</b> GFS 13 km · Open-Meteo. Dados a 10 m, sem downscaling local.
+      <b>Angra:</b> vento real ~15–25% menor que o modelo. Dias 1–3 precisos; 6–10 são tendência.
+      <b>Toque em qualquer linha</b> para ver o detalhe hora a hora.
+    </div>
+    <div class="footer" id="footer"></div>
+  </div>
+</div>
+
+<!-- DETAIL VIEW -->
+<div id="view-detail">
+  <div class="page">
+    <div class="detail-header">
+      <div class="detail-title" id="detail-title"></div>
+      <div class="detail-sub" id="detail-sub"></div>
+    </div>
+    <div class="wg-scroll" id="wg-scroll">
+      <table class="wg-table" id="wg-table">
+        <tbody id="wg-body"></tbody>
+      </table>
+    </div>
+    <div class="note" style="margin-top:10px;margin-bottom:0">
+      Colunas <span style="display:inline-block;width:8px;height:8px;background:color-mix(in srgb,var(--accent) 15%,#fff);border:1px solid var(--accent);border-radius:1px;vertical-align:middle"></span> = janelas de vela (08–11h e 13–16h) · Separadores de dia: cinza = semana, <span style="color:#b06820;font-weight:700">âmbar</span> = fim de semana.
+    </div>
+  </div>
+</div>
+
+<script>
+const SPOTS = [
+  { name: 'Baía de Guanabara',  sub: 'Praia do Flamengo · Rio de Janeiro',  lat: -22.930387, lon: -43.158968 },
+  { name: 'Barra da Tijuca',    sub: 'Praia da Barra · Rio de Janeiro',      lat: -23.050651, lon: -43.272594 },
+  { name: 'Armação de Búzios',  sub: 'Praia de Manguinhos · Búzios Vela Clube', lat: -22.757949, lon: -41.921844 },
+  { name: 'Ilha da Jipoia',     sub: 'Baía de Angra dos Reis · face externa', lat: -23.0833,   lon: -44.3167   },
+  { name: 'Enseada de Palmas',  sub: 'Angra dos Reis',                       lat: -23.118167, lon: -44.092328 },
+];
+
+const MORNING_HOURS   = [7,8,9,10,11];
+const AFTERNOON_HOURS = [12,13,14,15,16,17];
+const SAIL_HOURS      = new Set([...MORNING_HOURS, ...AFTERNOON_HOURS]); // 7–17h
+const DAYS_PT   = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const MONTHS_PT = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+// Cache fetched hourly data per spot index
+const dataCache = {};
+let currentSpotIdx = 0;
+let currentDate    = null;
+
+function degToDir(d) {
+  return ['N','NNE','NE','ENE','L','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO'][Math.round(d/22.5)%16];
+}
+function dirArrow(d) {
+  const arrows = ['↓','↙','←','↖','↑','↗','→','↘'];
+  return arrows[Math.round(d/45)%8];
+}
+function avg(arr) { return arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : null; }
+
+function windowStats(h, dateStr, hours) {
+  const s=[],g=[],d=[];
+  h.time.forEach((t,i)=>{
+    if(!t.startsWith(dateStr)) return;
+    const hr=parseInt(t.slice(11,13));
+    if(!hours.includes(hr)) return;
+    if(h.windspeed_10m[i]!=null)     s.push(h.windspeed_10m[i]);
+    if(h.windgusts_10m[i]!=null)     g.push(h.windgusts_10m[i]);
+    if(h.winddirection_10m[i]!=null) d.push(h.winddirection_10m[i]);
+  });
+  if(!s.length) return null;
+  return {speed:avg(s),gust:avg(g),dir:degToDir(avg(d))};
+}
+
+function verdict(speed,gust) {
+  if(gust==null)              return {cls:'v-bad',   label:'—'};
+  if(speed>=14&&gust>=18)     return {cls:'v-strong',label:'ÓTIMO!'};
+  if(gust>=14)                return {cls:'v-go',    label:'VAI!'};
+  if(gust>=10)                return {cls:'v-maybe', label:'TALVEZ'};
+  return                             {cls:'v-bad',   label:'FRACO'};
+}
+function cellCls(speed,gust) {
+  if(gust==null)          return '';
+  if(speed>=14&&gust>=18) return 'v-strong-cell';
+  if(gust>=14)            return 'v-go-cell';
+  if(gust>=10)            return 'v-maybe-cell';
+  return '';
+}
+function buildCell(stats) {
+  if(!stats) return `<td class="window-cell"><div class="cell-inner"><span style="color:var(--faint);font-size:10px">—</span></div></td>`;
+  const v=verdict(stats.speed,stats.gust);
+  return `<td class="window-cell ${cellCls(stats.speed,stats.gust)}">
+    <div class="cell-inner">
+      <div class="cell-top">
+        <span class="wind-val">${Math.round(stats.speed)} kt</span>
+        <span class="sep">·</span>
+        <span class="gust-val">↑${Math.round(stats.gust)} kt</span>
+      </div>
+      <div class="cell-bot">
+        <span class="dir-val">${stats.dir}</span>
+        <span class="sep">·</span>
+        <span class="verdict ${v.cls}">${v.label}</span>
+      </div>
+    </div>
+  </td>`;
+}
+
+function renderSpot(spotIdx, h) {
+  const spot  = SPOTS[spotIdx];
+  const dates = [...new Set(h.time.map(t=>t.slice(0,10)))].slice(0,10);
+  let rows = '';
+  dates.forEach(dateStr => {
+    const dt       = new Date(dateStr+'T12:00:00');
+    const dayIdx   = dt.getDay();
+    const isWk     = dayIdx===0||dayIdx===6;
+    const isSat    = dayIdx===6;
+    const isSun    = dayIdx===0;
+    const dow      = DAYS_PT[dayIdx];
+    const ddate    = `${dt.getDate()} ${MONTHS_PT[dt.getMonth()]}`;
+    const morn     = windowStats(h,dateStr,MORNING_HOURS);
+    const aftn     = windowStats(h,dateStr,AFTERNOON_HOURS);
+    const trCls    = [isWk?'weekend':'',isSat?'weekend-sat':'',isSun?'weekend-sun':''].filter(Boolean).join(' ');
+    const dowCls   = isWk?' dow-weekend':'';
+    const ddateCls = isWk?' ddate-weekend':'';
+    rows += `<tr class="${trCls}" onclick="openDetail(${spotIdx},'${dateStr}')">
+      <td class="date-cell">
+        <span class="dow${dowCls}">${dow}</span>
+        <span class="ddate${ddateCls}">${ddate}</span>
+      </td>
+      ${buildCell(morn)}
+      ${buildCell(aftn)}
+    </tr>`;
+  });
+
+  return `<div class="spot">
+    <div class="spot-head">
+      <div>
+        <div class="spot-name">${spot.name}</div>
+        <div class="spot-sub">${spot.sub}</div>
+      </div>
+    </div>
+    <table>
+      <thead><tr>
+        <th>Data</th>
+        <th class="window-header">Manhã 08–11h<span class="window-label">vento · ↑ rajada · dir</span></th>
+        <th class="window-header">Tarde 13–16h<span class="window-label">vento · ↑ rajada · dir</span></th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
+
+// ── COLOR SCALES (corrected Windguru palette) ────────────────
+function wsClass(v) {
+  if (v == null) return '';
+  if (v <  4) return 'ws-0';
+  if (v <  7) return 'ws-1';
+  if (v < 10) return 'ws-2';
+  if (v < 14) return 'ws-3';
+  if (v < 18) return 'ws-4';
+  if (v < 22) return 'ws-5';
+  if (v < 28) return 'ws-6';
+  return 'ws-7';
+}
+function wgClass(v) {
+  if (v == null) return '';
+  if (v <  5) return 'wg-0';
+  if (v <  9) return 'wg-1';
+  if (v < 12) return 'wg-2';
+  if (v < 16) return 'wg-3';
+  if (v < 20) return 'wg-4';
+  if (v < 24) return 'wg-5';
+  if (v < 28) return 'wg-6';
+  if (v < 34) return 'wg-7';
+  return 'wg-8';
+}
+function wvClass(v) {
+  if (v == null) return '';
+  if (v < 0.3) return 'wv-0';
+  if (v < 0.8) return 'wv-1';
+  if (v < 1.5) return 'wv-2';
+  if (v < 2.5) return 'wv-3';
+  if (v < 4.0) return 'wv-4';
+  return 'wv-5';
+}
+function ccClass(v) {
+  if (v == null) return '';
+  if (v < 10) return 'cc-0';
+  if (v < 30) return 'cc-1';
+  if (v < 60) return 'cc-2';
+  if (v < 85) return 'cc-3';
+  return 'cc-4';
+}
+function ppClass(v) {
+  if (!v || v < 0.05) return 'pp-0';
+  if (v < 0.5)  return 'pp-1';
+  if (v < 2.0)  return 'pp-2';
+  return 'pp-3';
+}
+function fmt(v, dec=0) { return v != null ? (+v).toFixed(dec) : '—'; }
+
+// ── TIDE FETCH ────────────────────────────────────────────────
+// Uses Open-Meteo Marine for sea level (no dedicated tide API needed)
+// We approximate tide from the hourly sea_level_height_msl data
+async function fetchTide(spot) {
+  // Open-Meteo marine endpoint for wave + tide-approx
+  const p = new URLSearchParams({
+    latitude: spot.lat, longitude: spot.lon,
+    hourly: 'sea_level_height_msl',
+    timezone: 'America/Sao_Paulo',
+    forecast_days: 10,
+  });
+  try {
+    const r = await fetch(`https://marine-api.open-meteo.com/v1/marine?${p}`);
+    if (!r.ok) return null;
+    return (await r.json()).hourly;
+  } catch { return null; }
+}
+
+// ── DETAIL VIEW ───────────────────────────────────────────────
+function openDetail(spotIdx, dateStr) {
+  currentSpotIdx = spotIdx;
+  currentDate    = dateStr;
+  const spot = SPOTS[spotIdx];
+
+  document.getElementById('view-main').style.display   = 'none';
+  document.getElementById('view-detail').style.display = 'block';
+  document.getElementById('back-btn').style.display    = 'inline';
+  document.getElementById('detail-title').textContent  = spot.name;
+  document.getElementById('detail-sub').textContent    = spot.sub;
+
+  const h = dataCache[spotIdx];
+  if (h) {
+    renderContinuous(h, tideCache[spotIdx] || null, dateStr);
+  } else {
+    document.getElementById('wg-body').innerHTML =
+      `<tr><td class="row-label">—</td><td colspan="10" style="padding:1rem;color:var(--faint)">Carregando…</td></tr>`;
+  }
+  window.scrollTo(0,0);
+}
+
+function renderContinuous(h, tide, scrollToDate) {
+  const dates = [...new Set(h.time.map(t=>t.slice(0,10)))].slice(0,10);
+
+  // Build column index: each entry = { dateStr, hr, idx, dayIdx, isFirst }
+  const cols = [];
+  const dateFirstCol = {};
+  h.time.forEach((t,i) => {
+    const d  = t.slice(0,10);
+    const hr = parseInt(t.slice(11,13));
+    if (!dates.includes(d)) return;
+    if (!(d in dateFirstCol)) dateFirstCol[d] = cols.length;
+    cols.push({ d, hr, i, isFirst: !(d in dateFirstCol) || dateFirstCol[d] === cols.length - (d in dateFirstCol ? 0 : 1) });
+  });
+  // Fix isFirst
+  const seenDates = new Set();
+  cols.forEach(c => { c.isFirst = !seenDates.has(c.d); seenDates.add(c.d); });
+
+  const PEAK_HOURS = new Set([7,8,9,10,11,12,13,14,15,16,17]);
+
+  function colBorderCls(c) {
+    if (!c.isFirst) return '';
+    const dt   = new Date(c.d+'T12:00:00');
+    const isWk = dt.getDay()===0||dt.getDay()===6;
+    return isWk ? ' wk-start' : ' day-start';
+  }
+  function peakDimCls(hr) {
+    return PEAK_HOURS.has(hr) ? ' peak-col' : ' dim-col';
+  }
+  function sailHdrCls(hr) {
+    // sail-col no longer used separately — peak covers 7-17h
+    return '';
+  }
+
+  // ── header row 1: day label spanning its columns ──
+  let dayHeaderCells = `<th class="label-th"></th>`;
+  dates.forEach(d => {
+    const dt    = new Date(d+'T12:00:00');
+    const isWk  = dt.getDay()===0||dt.getDay()===6;
+    const label = `${DAYS_PT[dt.getDay()]} ${dt.getDate()} ${MONTHS_PT[dt.getMonth()]}`;
+    const colCount = cols.filter(c=>c.d===d).length;
+    const borderCls = isWk ? ' wk-start' : ' day-start';
+    const wkCls = isWk ? ' wk-day' : '';
+    dayHeaderCells += `<th colspan="${colCount}" class="${borderCls}${wkCls}" style="text-align:left;padding-left:4px">${label}</th>`;
+  });
+
+  // ── header row 2: EVERY column gets 3-line: dow / date / hour ──
+  let hourCells = `<th class="label-th">hora</th>`;
+  cols.forEach(c => {
+    const dt      = new Date(c.d+'T12:00:00');
+    const isWk    = dt.getDay()===0||dt.getDay()===6;
+    const borderCls = colBorderCls(c);
+    const peakCls   = peakDimCls(c.hr);
+    const sailCls   = sailHdrCls(c.hr);
+    const wkCls     = isWk ? ' wk-day' : '';
+    const dow   = DAYS_PT[dt.getDay()];
+    const dnum  = dt.getDate();
+    hourCells += `<th id="col-${c.d}-${c.hr}" class="${borderCls}${peakCls}${sailCls}${wkCls}"><span style="display:block;font-size:8px;font-weight:${isWk?700:500};line-height:1.2">${dow}</span><span style="display:block;font-size:9px;line-height:1.2">${dnum}</span><span style="display:block;font-size:10px;line-height:1.3">${String(c.hr).padStart(2,'0')}h</span></th>`;
+  });
+
+  function row(label, cells, sepBefore=false, rowId='') {
+    return `<tr${sepBefore?' class="row-sep"':''}${rowId?` id="${rowId}"`:''}><td class="row-label">${label}</td>${cells}</tr>`;
+  }
+  function makeCells(fn) { return cols.map(fn).join(''); }
+
+  const speedCells = makeCells(c => {
+    const v = h.windspeed_10m[c.i];
+    return `<td class="${wsClass(v)}${colBorderCls(c)}${peakDimCls(c.hr)}">${fmt(v)}</td>`;
+  });
+  const gustCells = makeCells(c => {
+    const v = h.windgusts_10m[c.i];
+    return `<td class="${wgClass(v)}${colBorderCls(c)}${peakDimCls(c.hr)}">${fmt(v)}</td>`;
+  });
+  const dirArrowCells = makeCells(c => {
+    const v = h.winddirection_10m[c.i];
+    return `<td class="dir-cell${colBorderCls(c)}${peakDimCls(c.hr)}">${v!=null?dirArrow(v):'—'}</td>`;
+  });
+  const dirTextCells = makeCells(c => {
+    const v = h.winddirection_10m[c.i];
+    return `<td style="font-size:8px;color:var(--muted)" class="${colBorderCls(c)}${peakDimCls(c.hr)}">${v!=null?degToDir(v):'—'}</td>`;
+  });
+
+  // Waves
+  const hasWave = h.wave_height && h.wave_height.some(v=>v!=null);
+  const waveCells = hasWave ? makeCells(c => {
+    const v = h.wave_height?.[c.i];
+    return `<td class="${wvClass(v)}${colBorderCls(c)}${peakDimCls(c.hr)}">${v!=null?v.toFixed(1):'—'}</td>`;
+  }) : null;
+  const wavePeriodCells = hasWave && h.wave_period ? makeCells(c => {
+    const v = h.wave_period?.[c.i];
+    return `<td style="background:#eef3f8;color:#3a5878" class="${colBorderCls(c)}${peakDimCls(c.hr)}">${v!=null?Math.round(v):'—'}</td>`;
+  }) : null;
+  const waveDirCells = hasWave && h.wave_direction ? makeCells(c => {
+    const v = h.wave_direction?.[c.i];
+    return `<td class="dir-cell${colBorderCls(c)}${peakDimCls(c.hr)}">${v!=null?dirArrow(v):'—'}</td>`;
+  }) : null;
+
+  // Tide — convert MSL → Chart Datum using official CHM offset for Ilha Fiscal, Rio de Janeiro
+  // Source: DHN/CHM Tábua de Marés 2026, Carta 1515 — "Nível Médio 0.73 m"
+  const TIDE_DATUM_OFFSET = 0.73;
+  const hasTide = h.sea_level_height_msl && h.sea_level_height_msl.some(v=>v!=null);
+  const tideVals = hasTide ? h.sea_level_height_msl.map(v => v != null ? v + TIDE_DATUM_OFFSET : null) : null;
+  let tideMin = Infinity, tideMax = -Infinity;
+  if (tideVals) tideVals.forEach(v => { if(v!=null){ tideMin=Math.min(tideMin,v); tideMax=Math.max(tideMax,v); } });
+  function tideClass(v) {
+    if (v == null || tideMax === tideMin) return 'tide-mid';
+    const ratio = (v - tideMin) / (tideMax - tideMin);
+    if (ratio > 0.80) return 'tide-hi';
+    if (ratio > 0.55) return 'tide-mhi';
+    if (ratio > 0.35) return 'tide-mid';
+    if (ratio > 0.15) return 'tide-mlo';
+    return 'tide-lo';
+  }
+  const tideCells = hasTide ? makeCells(c => {
+    const v = tideVals?.[c.i];
+    return `<td class="${tideClass(v)}${colBorderCls(c)}${peakDimCls(c.hr)}">${v!=null?v.toFixed(1):'—'}</td>`;
+  }) : null;
+
+  const tempCells = h.temperature_2m ? makeCells(c => {
+    const v = h.temperature_2m[c.i];
+    return `<td class="tp-cell${colBorderCls(c)}${peakDimCls(c.hr)}">${v!=null?Math.round(v):'—'}</td>`;
+  }) : null;
+  const cloudCells = h.cloudcover ? makeCells(c => {
+    const v = h.cloudcover[c.i];
+    return `<td class="${ccClass(v)}${colBorderCls(c)}${peakDimCls(c.hr)}">${v!=null?Math.round(v):'—'}</td>`;
+  }) : null;
+  const precipCells = h.precipitation ? makeCells(c => {
+    const v = h.precipitation[c.i];
+    return `<td class="${ppClass(v)}${colBorderCls(c)}${peakDimCls(c.hr)}">${(!v||v<0.05)?'':v.toFixed(1)}</td>`;
+  }) : null;
+
+  let html = `<tr class="day-header-row">${dayHeaderCells}</tr>`;
+  html += `<tr class="hour-row">${hourCells}</tr>`;
+  html += row('Vento (kt)', speedCells);
+  html += row('Rajada (kt)', gustCells);
+  html += row('Dir. vento →', dirArrowCells);
+  html += row('', dirTextCells);
+  if (waveCells)       html += row('Onda (m)', waveCells, true);
+  if (wavePeriodCells) html += row('Período onda (s)', wavePeriodCells);
+  if (waveDirCells)    html += row('Dir. onda →', waveDirCells);
+  if (tempCells)       html += row('Temp. (°C)', tempCells, true);
+  if (cloudCells)      html += row('Nuvens (%)', cloudCells, true);
+  if (precipCells)     html += row('Precip. (mm/h)', precipCells);
+  if (tideCells)       html += row('Maré MSL (m)', tideCells, true);
+
+  document.getElementById('wg-body').innerHTML = html;
+
+  // Scroll to clicked date
+  setTimeout(() => {
+    const target = document.getElementById(`col-${scrollToDate}-8`) ||
+                   document.getElementById(`col-${scrollToDate}-0`);
+    if (target) target.scrollIntoView({behavior:'smooth', block:'nearest', inline:'start'});
+  }, 80);
+}
+
+function showMain() {
+  document.getElementById('view-detail').style.display = 'none';
+  document.getElementById('view-main').style.display   = 'block';
+  document.getElementById('back-btn').style.display    = 'none';
+  window.scrollTo(0,0);
+}
+
+// ── FETCH & INIT ─────────────────────────────────────────────
+const tideCache = {};
+
+async function fetchSpot(spot) {
+  const p = new URLSearchParams({
+    latitude: spot.lat, longitude: spot.lon,
+    hourly: [
+      'windspeed_10m','windgusts_10m','winddirection_10m',
+      'temperature_2m','cloudcover','precipitation',
+    ].join(','),
+    wind_speed_unit: 'kn',
+    timezone: 'America/Sao_Paulo',
+    forecast_days: 10,
+  });
+  const r = await fetch(`https://api.open-meteo.com/v1/forecast?${p}`);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const wind = (await r.json()).hourly;
+
+  // Marine data (waves + tide) — separate endpoint
+  const pm = new URLSearchParams({
+    latitude: spot.lat, longitude: spot.lon,
+    hourly: 'wave_height,wave_period,wave_direction,sea_level_height_msl',
+    timezone: 'America/Sao_Paulo',
+    forecast_days: 10,
+  });
+  try {
+    const rm = await fetch(`https://marine-api.open-meteo.com/v1/marine?${pm}`);
+    if (rm.ok) {
+      const marine = (await rm.json()).hourly;
+      wind.wave_height      = marine.wave_height;
+      wind.wave_period      = marine.wave_period;
+      wind.wave_direction   = marine.wave_direction;
+      wind.sea_level_height_msl = marine.sea_level_height_msl;
+    }
+  } catch { /* marine optional */ }
+
+  return wind;
+}
+
+async function main() {
+  const container = document.getElementById('spots-container');
+  container.innerHTML = SPOTS.map(s =>
+    `<div class="spot"><div class="spot-head"><div class="spot-name">${s.name}</div></div><div class="loading-cell">Carregando…</div></div>`
+  ).join('');
+
+  const results = await Promise.allSettled(SPOTS.map(fetchSpot));
+
+  results.forEach((r, i) => {
+    if (r.status === 'fulfilled') dataCache[i] = r.value;
+  });
+
+  container.innerHTML = results.map((r, i) =>
+    r.status === 'fulfilled'
+      ? renderSpot(i, r.value)
+      : `<div class="spot"><div class="spot-head"><div class="spot-name">${SPOTS[i].name}</div></div><div class="loading-cell" style="color:#e05a5a">Erro: ${r.reason?.message}</div></div>`
+  ).join('');
+
+  const now = new Date();
+  const ts  = now.toLocaleString('pt-BR', {dateStyle:'short', timeStyle:'short'});
+  document.getElementById('app-meta').innerHTML = `GFS 13 km · Open-Meteo · 10 m<br>${ts}`;
+  document.getElementById('footer').textContent = `Atualizado ${ts}`;
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const btn  = document.getElementById('theme-toggle');
+  if (html.getAttribute('data-theme') === 'dark') {
+    html.removeAttribute('data-theme');
+    btn.textContent = '☾ Escuro';
+  } else {
+    html.setAttribute('data-theme', 'dark');
+    btn.textContent = '☀ Claro';
+  }
+}
+
+main();
+</script>
+</body>
+</html>
