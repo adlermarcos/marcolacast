@@ -793,8 +793,8 @@ function showMain() {
 const tideCache = {};
 let currentModel = 'gfs';
 const MODELS = {
-  gfs:   { param: 'gfs_seamless', label: 'GFS 25km',  next: 'ecmwf' },
-  ecmwf: { param: 'ifs_hres',     label: 'ECMWF 9km', next: 'gfs'   },
+  gfs:   { param: null,       label: 'GFS',        next: 'ecmwf' },
+  ecmwf: { param: 'ifs_hres', label: 'ECMWF 9km',  next: 'gfs'   },
 };
 
 async function fetchSpot(spot) {
@@ -804,11 +804,11 @@ async function fetchSpot(spot) {
       'windspeed_10m','windgusts_10m','winddirection_10m',
       'temperature_2m','cloudcover','precipitation',
     ].join(','),
-    models: MODELS[currentModel].param,
     wind_speed_unit: 'kn',
     timezone: 'America/Sao_Paulo',
     forecast_days: 10,
   });
+  if (MODELS[currentModel].param) p.set('models', MODELS[currentModel].param);
   const r = await fetch(`https://api.open-meteo.com/v1/forecast?${p}`);
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   const wind = (await r.json()).hourly;
