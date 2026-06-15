@@ -373,8 +373,8 @@ td.v-maybe-cell  { background: color-mix(in srgb, var(--maybe-bg) 50%, transpare
   </div>
   <div id="app-meta" class="app-meta">Carregando…</div>
   <select id="model-select" onchange="switchModel(this.value)" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:6px 8px;border-radius:20px;cursor:pointer;flex-shrink:0;outline:none;">
-    <option value="gfs">GFS</option>
-    <option value="ecmwf">ECMWF 9km</option>
+    <option value="gfs">GFS 13km</option>
+    <option value="icon">ICON 13km</option>
   </select>
   <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">☾ Escuro</button>
 </div>
@@ -796,18 +796,15 @@ function showMain() {
 const tideCache = {};
 let currentModel = 'gfs';
 const MODELS = {
-  gfs:   { param: null,         label: 'GFS 13km',   next: 'ecmwf' },
-  ecmwf: { param: 'ecmwf_ifs',  label: 'ECMWF 9km',  next: 'gfs'   },
+  gfs:  { param: null,            label: 'GFS 13km',  next: 'icon' },
+  icon: { param: 'icon_seamless', label: 'ICON 13km', next: 'gfs'  },
 };
 
 async function fetchSpot(spot) {
-  const isEcmwf = currentModel === 'ecmwf';
   const p = new URLSearchParams({
     latitude: spot.lat, longitude: spot.lon,
     hourly: [
-      'windspeed_10m',
-      isEcmwf ? 'wind_gusts_10m' : 'windgusts_10m',
-      'winddirection_10m',
+      'windspeed_10m','windgusts_10m','winddirection_10m',
       'temperature_2m','cloudcover','precipitation',
     ].join(','),
     wind_speed_unit: 'kn',
@@ -818,7 +815,6 @@ async function fetchSpot(spot) {
   const r = await fetch(`https://api.open-meteo.com/v1/forecast?${p}`);
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   const wind = (await r.json()).hourly;
-  if (isEcmwf) wind.windgusts_10m = wind.wind_gusts_10m;
 
   // Marine data (waves + tide) — separate endpoint
   const pm = new URLSearchParams({
