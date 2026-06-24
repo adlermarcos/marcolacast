@@ -373,7 +373,7 @@ td.v-maybe-cell  { background: color-mix(in srgb, var(--maybe-bg) 50%, transpare
   </div>
   <div id="app-meta" class="app-meta">Carregando…</div>
   <select id="model-select" onchange="switchModel(this.value)" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:6px 8px;border-radius:20px;cursor:pointer;flex-shrink:0;outline:none;">
-    <option value="gfs">GFS 13km</option>
+    <option value="gfs">Best Match</option>
     <option value="icon">ICON 11km</option>
   </select>
   <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">☾ Escuro</button>
@@ -394,7 +394,7 @@ td.v-maybe-cell  { background: color-mix(in srgb, var(--maybe-bg) 50%, transpare
     </div>
     <div id="spots-container"></div>
     <div class="note">
-      <b>Modelo:</b> GFS 13 km · Open-Meteo. Dados a 10 m, sem downscaling local.
+      <b>Modelo:</b> Best Match · Open-Meteo. Dados a 10 m, sem downscaling local.
       <b>Angra:</b> vento real ~15–25% menor que o modelo. Dias 1–3 precisos; 6–10 são tendência.
       <b>Toque em qualquer linha</b> para ver o detalhe hora a hora.
     </div>
@@ -799,7 +799,7 @@ function showMain() {
 const tideCache = {};
 let currentModel = 'gfs';
 const MODELS = {
-  gfs:  { param: null,            label: 'GFS 13km',  next: 'icon' },
+  gfs:  { param: null,            label: 'Best Match', next: 'icon' },
   icon: { param: 'icon_seamless', label: 'ICON 11km', next: 'gfs'  },
 };
 
