@@ -453,12 +453,15 @@ function windowStats(h, dateStr, hours) {
     if(!t.startsWith(dateStr)) return;
     const hr=parseInt(t.slice(11,13));
     if(!hours.includes(hr)) return;
-    if(h.windspeed_10m[i]!=null)     s.push(h.windspeed_10m[i]);
-    if(h.windgusts_10m[i]!=null)     g.push(h.windgusts_10m[i]);
+    const ws = h.windspeed_10m[i];
+    const wg = h.windgusts_10m[i];
+    if(ws!=null) s.push(ws);
+    if(wg!=null) g.push(wg);
     if(h.winddirection_10m[i]!=null) d.push(h.winddirection_10m[i]);
   });
   if(!s.length) return null;
-  return {speed:avg(s),gust:avg(g),dir:degToDir(avg(d))};
+  const gustVal = g.length ? Math.max(...g) : (s.length ? avg(s) : null);
+  return {speed:avg(s), gust:Math.max(gustVal, avg(s)), dir:degToDir(avg(d))};
 }
 
 function verdict(speed,gust) {
